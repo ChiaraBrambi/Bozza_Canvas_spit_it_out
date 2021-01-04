@@ -1,162 +1,194 @@
 let b1, b2, b3, b4;
-let btn_text= 'AVANTI';
+let p;
+let btn_text = 'AVANTI';
 
-//////////canvas //////////////////
-let  agents = [];
-let agentCount = 4000;
-//  var noiseScale = 300;
-//  var noiseStrength = 10;
-let  overlayAlpha = 10;
-//  var agentAlpha = 90;
-//  var strokeWidth = 0.3;
-//  //var drawMode = 1;
+//impostazioni riconoscimento vocale //////////////////////////
+let lang = 'en-US'; //|| 'it-IT'
+let speechRec = new p5.SpeechRec(lang, gotSpeech);
 
+let shapes = [];
+let newShape;
 
+let articolazioni = 3;
+let lineLength = 100; //lunghezza poi da inpostare in base a quanto è lunga la stringa della parola
+var resolution = 0.05; //risoluzone 0.04; / scrive da solo
+var gravity = 0.094;
+var smorzamento = 0.998;//smorzamento 0.998 / dimensione lettere
 
-///////// onda parole //////////////////////////
-let xspacing = 30; // Distance between each horizontal location
-let w_onda; // Width of entire wave
-let theta = 0.0; // Start angle at 0
-let amplitude = 20.0; // Height of wave
-let period = 510.0; // How many pixels before the wave repeats
-let dx; // Value for incrementing x
-let yvalues; // Using an array to store height values for the wave
+var font = 'Georgia';
+var letters = 'Hi, how are you?';
+var fontSizeMin = 8;
 
-function preload(){}
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  colorMode(HSB, 360, 100, 100, 100); //colorMode(mode, max1, max2, max3, [maxA])
+  strokeWeight(1);
+  textFont(font, fontSizeMin);
 
- function setup() {
- createCanvas(windowWidth,windowHeight);
- //impostazioni riconoscimento vocale //////////////////////////
- let lang = 'it-IT';//||'en-US'
- let speechRec = new p5.SpeechRec(lang, gotSpeech);
- //forse ha senso dare la possibilità di scegliere qale lingua l'utente vuole
- //es. IT or EN
- speechRec.start();
-
-
- // //impostazioni riconoscimento vocale
- // let continuous = true; //continua a registrare
- // let interim = true;
- // speechRec.start(continuous, interim);
-
-
-    //background
-    fill(0, overlayAlpha*5);//poi da mettere nel draw per reciclare
-    noStroke();
-    rect(0, 0, width,height);
-
-    b1 = createButton('inserisci il tuo pensiero');
-    b1.position(width/2*1.7, height/2*0.1);
-    b1.mousePressed(popUp);
-    b1.id('startBtn');
-
-////////onda setup //////////////////////////
-  w_onda = width/2*1.3;//dove finisce l'onda
-  dx = (TWO_PI / period) * xspacing;
-  yvalues = new Array(floor(w_onda / xspacing));
-
-//   for (var i = 0; i < agentCount; i++) {
-//         agents[i] = new Agent();
-//       }
-
+  b1 = createButton('inserisci il tuo pensiero');
+  b1.position(width / 2 * 1.7, height / 2 * 0.1);
+  b1.mousePressed(popUp);
+  b1.id('startBtn');
 }
 
- function draw() {
-// // Draw agents
-//   stroke(0, agentAlpha);
-//     for (var i = 0; i < agentCount; i++) {
-//       //if (drawMode == 1)
-//       agents[i].update1(noiseScale, noiseStrength, strokeWidth);
-//       //else agents[i].update2(noiseScale, noiseStrength, strokeWidth);
-//     }
+function draw() {
+  background(0, 0, 100);
 
-//calcWave();
-//renderWave();
+  //per ogni elemento dell'array chiama le seguenti funzioni
+  shapes.forEach(function(shape){ shape.draw();shape.update();}); //non sei obbligato a dare un nome ad una funzione
+
+  if (newShape) { //se newShape == true viene attivato il comando
+  newShape.addPos(mouseX, mouseY);
+  newShape.draw();
+  newShape.update();
+}
+}//fine draw
+
+function Shape(pendulumPathColor) { //class this.value
+  this.shapePath = [];
+  this.pendulumPath = [];
+  this.pendulumPathColor = pendulumPathColor;
+  this.iterator = 0;
+  this.lineLength = lineLength;
+  this.resolution = resolution;
+  this.pendulum = new Pendulum(this.lineLength, articolazioni); //constructor function
+  this.letterIndex = 0;
+
+  Shape.prototype.addPos = function(x, y) { //per chiamare piu classi diverse
+  //nomeClasse.protoype.nomeFunzione = function(){
+  //codice da svolgere per ogni classe }
+  var newPos = createVector(x, y);
+  this.shapePath.push(newPos);
+  };
+
+  Shape.prototype.draw = function() {
+    if (this.pendulumPath.length) {
+      noStroke();
+      fill(this.pendulumPathColor);
+      this.letterIndex = 0;
+      this.pendulumPath.forEach(function(pos, posIndex) {
+        var newLetter = letters.charAt(this.letterIndex);//?
+// tenere le tettere distanziate
+  var nextPosIndex = this.pendulumPath.findIndex(function(nextPos, nextPosIndex) {
+  if (nextPosIndex > posIndex) {
+    var d = p5.Vector.dist(nextPos, pos);//distanza
+    textSize(max(fontSizeMin, d));//dimensione delle lettere dipende dalla distanza tra loro
+    return d > textWidth(newLetter);
+  } });
+
+var nextPos = this.pendulumPath[nextPosIndex];
+
+if (nextPos) {//scrivi la lettera vera e propria
+      var angle = atan2(nextPos.y - pos.y, nextPos.x - pos.x); //tangente
+      push();
+      translate(pos.x, pos.y);
+      rotate(angle);
+      text(newLetter, 0, 0);
+      pop();
+      this.letterIndex++;
+      if (this.letterIndex >= letters.length) {
+        this.letterIndex = 0;
+      }
+    }
+
+  }.bind(this));//metodo che crea una funzione
+    noFill();
+}//si chiude if this.pendulumPathColor
+if (this.iterator < this.shapePath.length) {
+      var currentIndex = floor(this.iterator);
+
+      var currentPos = this.shapePath[currentIndex];
+      var previousPos = this.shapePath[currentIndex - 1];
+      if (previousPos) {
+        var offsetPos = p5.Vector.lerp(previousPos, currentPos, this.iterator - currentIndex);
+        var heading = atan2(currentPos.y - previousPos.y, currentPos.x - previousPos.x) - HALF_PI;
+
+        push();
+        translate(offsetPos.x, offsetPos.y);
+        this.pendulum.update(heading);
+        pop();
+        this.pendulumPath.push(this.pendulum.getTrail(offsetPos));
+      }
+    }
+}//si chiude shape.prototype
+
+Shape.prototype.update = function() {
+  this.iterator += this.resolution;
+  this.iterator = constrain(this.iterator, 0, this.shapePath.length);
+  };
+}
+
+function mousePressed() {
+  newShape = new Shape(color(random(360), 80, 60)); //constructor function
+  newShape.addPos(mouseX, mouseY); //posizione
+}
+
+function mouseReleased() { //quando lascio il mouse
+  shapes.push(newShape); //crea forma
+  newShape = undefined;
 }
 
 
 function popUp() {
-push();//pop up
-rectMode(CENTER);
-fill(0, 0, 0);
-rect(width/2,height/2, width/2.5,height/2, 20);
-pop();
-//bottone avanti
-b2 = createButton( btn_text);
-b2.position(width/2-80, height/3*2);
-b2.mousePressed(go);
-b2.id('goBtn');
-
-//bottone indietro
-b3 = createButton('<');
-b3.position(width/2*0.65, height/2*0.6);
-b3.mousePressed(back);
-b3.id('fBtn');
-
-}
-
-function go(){
-//document.getElementById('goBtn').style.display = 'none';
-btn_text = 'PREVIEW';
-b2 = createButton( btn_text);
-b2.position(width/2-80, height/3*2);
-//bottone indietro
-b4 = createButton('microfono');
-b4.position(width/2-60, height/3*1.2);
-b4.mousePressed(microfono);
-b4.id('fBtn');
-}
-
-function back(){
-document.getElementById('goBtn').style.display = 'none';
-document.getElementById('fBtn').style.display = 'none';
-background(255);
-}
-
-function microfono(){
-
-  rectMode(CENTER);
-  fill(32, 178, 170);
-  rect(width/2,height/2, width/2.5,height/2, 20);
-
-}
-
-/////////////////////////////////onda
-function calcWave() {
-// Increment theta (try different values for 'angular velocity' here)
-  theta += 0.02;
-// For every x value, calculate a y value with sine function
-  let x = theta;
-  for (let i = 0; i < yvalues.length; i++) {
-    yvalues[i] = sin(x) * amplitude;
-    x += dx;
-  }
-}
-
-function renderWave() {
-  push();//pop up
+  push(); //pop up
   rectMode(CENTER);
   fill(0, 0, 0);
-  rect(width/2,height/2, width/2.5,height/4, 20);
+  rect(width / 2, height / 2, width / 2.5, height / 2, 20);
   pop();
-  push()
-  noStroke();
-  fill(255);
-  // A simple way to draw the wave with an ellipse at each location
-  for (let x = 15; x < yvalues.length; x++) {
-    ellipse(x * xspacing, height / 2 + yvalues[x], 5, 5);
+  //bottone avanti
+  b2 = createButton(btn_text);
+  b2.position(width / 2 - 80, height / 3 * 2);
+  b2.mousePressed(go);
+  b2.id('goBtn');
+
+  //bottone indietro
+  b3 = createButton('<');
+  b3.position(width / 2 * 0.65, height / 2 * 0.6);
+  b3.mousePressed(back);
+  b3.id('fBtn');
+}
+
+function go() {
+  //document.getElementById('goBtn').style.display = 'none';
+  btn_text = 'PREVIEW';
+  b2 = createButton(btn_text);
+  b2.position(width / 2 - 80, height / 3 * 2);
+  //bottone indietro
+  b4 = createButton('microfono');
+  b4.position(width / 2 - 60, height / 3 * 1.2);
+  b4.mousePressed(microfono);
+  b4.id('fBtn');
+}
+
+function back() {
+  document.getElementById('goBtn').style.display = 'none';
+  document.getElementById('fBtn').style.display = 'none';
+  background(255);
+}
+
+function microfono() {
+  rectMode(CENTER);
+  fill(32, 178, 170);
+  rect(width / 2, height / 2, width / 2.5, height / 2, 20);
+  //impostazioni riconoscimento vocale
+  let continuous = false; //continua a registrare
+  let interim = true;
+  speechRec.start(continuous, interim);
+}
+
+function gotSpeech() {
+  if (speechRec.resultValue) {
+     createP(speechRec.resultString);
+    //  p.position(width/2*0.8, height/2);
+    console.log(speechRec.resultString)
   }
-    pop();
 }
+  // keyReleased = function() {
+  // if (keyCode == DELETE || keyCode == BACKSPACE){
+  //   background(255);
+  //   }
+  // }
 
-
-
-// keyReleased = function() {
-// if (keyCode == DELETE || keyCode == BACKSPACE){
-//   background(255);
-//   }
-// }
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
+  function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+  }
