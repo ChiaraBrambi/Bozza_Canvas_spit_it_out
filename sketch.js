@@ -1,5 +1,7 @@
 let b1, b2, b3, b4;
 let btn_text= 'AVANTI';
+
+//////////canvas //////////////////
 let  agents = [];
 let agentCount = 4000;
 //  var noiseScale = 300;
@@ -8,9 +10,10 @@ let  overlayAlpha = 10;
 //  var agentAlpha = 90;
 //  var strokeWidth = 0.3;
 //  //var drawMode = 1;
-//
 
-//////////////////onda parole /////////////////
+
+
+///////// onda parole //////////////////////////
 let xspacing = 30; // Distance between each horizontal location
 let w_onda; // Width of entire wave
 let theta = 0.0; // Start angle at 0
@@ -23,6 +26,20 @@ function preload(){}
 
  function setup() {
  createCanvas(windowWidth,windowHeight);
+ //impostazioni riconoscimento vocale //////////////////////////
+ let lang = 'it-IT';//||'en-US'
+ let speechRec = new p5.SpeechRec(lang, gotSpeech);
+ //forse ha senso dare la possibilità di scegliere qale lingua l'utente vuole
+ //es. IT or EN
+ speechRec.start();
+
+
+ // //impostazioni riconoscimento vocale
+ // let continuous = true; //continua a registrare
+ // let interim = true;
+ // speechRec.start(continuous, interim);
+
+
     //background
     fill(0, overlayAlpha*5);//poi da mettere nel draw per reciclare
     noStroke();
@@ -33,7 +50,7 @@ function preload(){}
     b1.mousePressed(popUp);
     b1.id('startBtn');
 
-  /////////onda setup
+////////onda setup //////////////////////////
   w_onda = width/2*1.3;//dove finisce l'onda
   dx = (TWO_PI / period) * xspacing;
   yvalues = new Array(floor(w_onda / xspacing));
@@ -41,6 +58,7 @@ function preload(){}
 //   for (var i = 0; i < agentCount; i++) {
 //         agents[i] = new Agent();
 //       }
+
 }
 
  function draw() {
