@@ -250,11 +250,10 @@ function mouseReleased() { //quando lascio il mouse
   newShape = undefined;
 }
 
-  // keyReleased = function() {
-  // if (keyCode == DELETE || keyCode == BACKSPACE){
-  //   background(255);
-  //   }
-  // }
+  keyReleased = function() {
+  if (keyCode == DELETE || keyCode == BACKSPACE){ background(255);
+    }
+  }
 
   function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
