@@ -1,5 +1,6 @@
 
 let p,b1;
+let mic, vol, vol_map; //Volume per dimensione lettere
 
 //impostazioni riconoscimento vocale //////////////////////////
 let lang = 'en-US'; //|| 'it-IT'
@@ -28,6 +29,9 @@ function setup() {
   b1.position(width / 2 * 1.7, height / 2 * 0.1);
   b1.mousePressed(microfono);
   b1.id('startBtn');
+
+  mic = new p5.AudioIn();
+  mic.start();
 }
 
 function draw() {
@@ -42,6 +46,11 @@ function draw() {
   newShape.draw();
   //newShape.update();
   }
+
+  //volume
+  vol = round(mic.getLevel(), 2);
+  vol_map = map(vol, 0, 1, 1, 150);
+  console.log("volume " + vol_map);
 }//fine draw
 
 
@@ -55,8 +64,7 @@ function gotSpeech() {
   if (speechRec.resultValue) {
      let text = speechRec.resultString;
      letters = text;
-    //  p.position(width/2*0.8, height/2);
-    console.log(speechRec.resultString)
+     console.log(speechRec.resultString)
   }
 }
 
@@ -88,7 +96,7 @@ function Shape(pendulumPathColor) { //class this.value
   var nextPosIndex = this.pendulumPath.findIndex(function(nextPos, nextPosIndex) {
   if (nextPosIndex > posIndex) {
     var d = p5.Vector.dist(nextPos, pos);//distanza
-    textSize(max(fontSizeMin, d));//dimensione delle lettere dipende dalla distanza tra loro
+    textSize(max(fontSizeMin*vol_map, d));//dimensione delle lettere dipende dalla distanza tra loro
     return d > textWidth(newLetter);
   } });
 
