@@ -1,6 +1,5 @@
-let b1, b2, b3, b4;
-let p;
-let btn_text = 'AVANTI';
+
+let p,b1;
 
 //impostazioni riconoscimento vocale //////////////////////////
 let lang = 'en-US'; //|| 'it-IT'
@@ -10,14 +9,14 @@ let shapes = [];
 let newShape;
 
 let articolazioni = 4;
-let lineLength = 100; //lunghezza poi da inpostare in base a quanto è lunga la stringa della parola
-var resolution = 0.05; //risoluzone 0.04; / scrive da solo
+let lineLength = 128; //lunghezza poi da inpostare in base a quanto è lunga la stringa della parola
+var resolution = 0.04; //risoluzone 0.04; / scrive da solo
 var gravity = 0.094;
 var smorzamento = 0.998;//smorzamento 0.998 / dimensione lettere
 
 var font = 'Georgia';
-var letters = '?';
-var fontSizeMin = 8;
+var letters = '';
+var fontSizeMin = 10;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -25,15 +24,14 @@ function setup() {
   strokeWeight(1);
   textFont(font, fontSizeMin);
 
-  b1 = createButton('inserisci pensiero');
+  b1 = createButton('microfono');
   b1.position(width / 2 * 1.7, height / 2 * 0.1);
-  b1.mousePressed(popUp);
+  b1.mousePressed(microfono);
   b1.id('startBtn');
 }
 
 function draw() {
-
-
+  background(255);
   //per ogni elemento dell'array chiama le seguenti funzioni
   shapes.forEach(function(shape){ shape.draw();
   shape.update();
@@ -42,54 +40,14 @@ function draw() {
   if (newShape) { //se newShape == true viene attivato il comando
   newShape.addPos(mouseX, mouseY);
   newShape.draw();
-  //newShape.update();??
+  //newShape.update();
   }
 }//fine draw
 
 
-
-function popUp() {
-  rectMode(CENTER);
-  fill('#8a2be2');
-  rect(width / 2, height / 2, width / 2.5, height / 2, 20);
-  //bottone avanti
-  b2 = createButton(btn_text);
-  b2.position(width / 2 - 80, height / 3 * 2);
-  b2.mousePressed(go);
-  b2.id('goBtn');
-
-  //bottone indietro
-  b3 = createButton('<');
-  b3.position(width / 2 * 0.65, height / 2 * 0.6);
-  b3.mousePressed(back);
-  b3.id('fBtn');
-}
-
-function go() {
-  //document.getElementById('goBtn').style.display = 'none';
-  btn_text = 'PREVIEW';
-  b2 = createButton(btn_text);
-  b2.position(width / 2 - 80, height / 3 * 2);
-  //bottone indietro
-  b4 = createButton('microfono');
-  b4.position(width / 2 - 60, height / 3 * 1.2);
-  b4.mousePressed(microfono);
-  b4.id('fBtn');
-}
-
-function back() {
-  document.getElementById('goBtn').style.display = 'none';
-  document.getElementById('fBtn').style.display = 'none';
-  background(255);
-}
-
 function microfono() {
-  rectMode(CENTER);
-  fill('#e2872c');
-  rect(width / 2, height / 2, width / 2.5, height / 2, 20);
-  //impostazioni riconoscimento vocale
-  let continuous = false; //continua a registrare
-  let interim = true;
+  let continuous = true; //continua a registrare
+  let interim = false;
   speechRec.start(continuous, interim);
 }
 
