@@ -9,7 +9,7 @@ let speechRec = new p5.SpeechRec(lang, gotSpeech);
 let shapes = [];
 let newShape;
 
-let articolazioni = 3;
+let articolazioni = 4;
 let lineLength = 100; //lunghezza poi da inpostare in base a quanto è lunga la stringa della parola
 var resolution = 0.05; //risoluzone 0.04; / scrive da solo
 var gravity = 0.094;
@@ -25,7 +25,7 @@ function setup() {
   strokeWeight(1);
   textFont(font, fontSizeMin);
 
-  b1 = createButton('inserisci il tuo pensiero');
+  b1 = createButton('inserisci pensiero');
   b1.position(width / 2 * 1.7, height / 2 * 0.1);
   b1.mousePressed(popUp);
   b1.id('startBtn');
@@ -35,14 +35,15 @@ function draw() {
 
 
   //per ogni elemento dell'array chiama le seguenti funzioni
-  shapes.forEach(function(shape){ shape.draw();shape.update();}); //non sei obbligato a dare un nome ad una funzione
+  shapes.forEach(function(shape){ shape.draw();
+  shape.update();
+  }); //non sei obbligato a dare un nome ad una funzione
 
   if (newShape) { //se newShape == true viene attivato il comando
   newShape.addPos(mouseX, mouseY);
   newShape.draw();
-  newShape.update();
-
-}
+  //newShape.update();??
+  }
 }//fine draw
 
 
