@@ -37,8 +37,9 @@ function setup() {
 function draw() {
   background(255);
   //per ogni elemento dell'array chiama le seguenti funzioni
-  shapes.forEach(function(shape){ shape.draw();
-  shape.update();
+  shapes.forEach(function(shape){
+    shape.draw();
+    shape.update();
   }); //non sei obbligato a dare un nome ad una funzione
 
   if (newShape) { //se newShape == true viene attivato il comando
@@ -88,17 +89,17 @@ class Shape{
   };
 
 
-  draw(){//Shape.prototype.draw = function() {
+  draw(){
     if (this.pendulumPath.length) {
       noStroke();
       fill(this.pendulumPathColor);
       this.letterIndex = 0;
       this.pendulumPath.forEach(function(pos, posIndex) {
-        var newLetter = letters.charAt(this.letterIndex);//?
+        var newLetter = letters.charAt(this.letterIndex);//prende la lettera all'indice letterIndex
 // tenere le tettere distanziate
   var nextPosIndex = this.pendulumPath.findIndex(function(nextPos, nextPosIndex) {
   if (nextPosIndex > posIndex) {
-    var d = p5.Vector.dist(nextPos, pos);//distanza
+    var d = p5.Vector.dist(nextPos, pos);//distanza tra due posizioni consecutive del vettore pendulumPath
     textSize(max(fontSizeMin*vol_map, d));//dimensione delle lettere dipende dalla distanza tra loro
     return d > textWidth(newLetter);
   } });
@@ -138,16 +139,16 @@ if (this.iterator < this.shapePath.length) {
         this.pendulumPath.push(this.pendulum.getTrail(offsetPos));
       }
     }
-}//si chiude shape.prototype
+}//si chiude draw
 
-update(){//Shape.prototype.update = function() {
+update(){
   this.iterator += this.resolution;
   this.iterator = constrain(this.iterator, 0, this.shapePath.length);
   };
 } //fine classe Shape
 
 ////////////////////////////////////////////////
-class Pendulum{//function Pendulum(size, hierarchy) {
+class Pendulum{
   constructor(size, hierarchy){
   this.hierarchy = hierarchy - 1;
   this.pendulumArm;
@@ -165,7 +166,7 @@ class Pendulum{//function Pendulum(size, hierarchy) {
   }
 }
 
-  update(heading){//Pendulum.prototype.update = function(heading) {
+  update(heading){
     this.end.set(this.origin.x + this.size * sin(this.angle), this.origin.y + this.size * cos(this.angle));
 
     this.angularAcceleration = (-this.gravity / this.size) * sin(this.angle + heading);
@@ -179,7 +180,7 @@ class Pendulum{//function Pendulum(size, hierarchy) {
   };
 
 
-    getTrail(offset, end){//Pendulum.prototype.getTrail = function(offset, end) {
+    getTrail(offset, end){  //dà il percorso di this
       if (this.pendulumArm) {
         if (end) {
           end.add(this.end);
@@ -192,24 +193,6 @@ class Pendulum{//function Pendulum(size, hierarchy) {
       }
     };
 
-   draw(){//  Pendulum.prototype.draw = function() {//anche da cancellare
-      stroke(0, 40);
-      beginShape();
-      vertex(this.origin.x, this.origin.y);
-      vertex(this.end.x, this.end.y);
-      endShape();
-
-      fill(0, 20);
-      ellipse(this.end.x, this.end.y, 2, 2);
-      noFill();
-
-      if (this.pendulumArm) {
-        push();
-        translate(this.end.x, this.end.y);
-        this.pendulumArm.draw();
-        pop();
-      }
-    };
   } //fine classe Pendulum
 
 function mousePressed() {
