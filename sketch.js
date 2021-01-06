@@ -16,7 +16,7 @@ var gravity = 0.094;
 var smorzamento = 0.998;//smorzamento 0.998 / dimensione lettere
 
 var font = 'Georgia';
-var letters = '';
+var letters = 'prova';
 var fontSizeMin = 10;
 
 function setup() {
@@ -70,7 +70,7 @@ function gotSpeech() {
 }
 
 class Shape{
-  constructor(pendulumPathColor){//function Shape(pendulumPathColor) { //class this.value
+  constructor(pendulumPathColor, string){//function Shape(pendulumPathColor) { //class this.value
   this.shapePath = [];
   this.pendulumPath = [];
   this.pendulumPathColor = pendulumPathColor;
@@ -79,6 +79,7 @@ class Shape{
   this.resolution = resolution;
   this.pendulum = new Pendulum(this.lineLength, articolazioni); //constructor function
   this.letterIndex = 0;
+  this.privateLetters = string;
 }
 
   addPos(x,y){//Shape.prototype.addPos = function(x, y) { //per chiamare piu classi diverse
@@ -95,7 +96,7 @@ class Shape{
       fill(this.pendulumPathColor);
       this.letterIndex = 0;
       this.pendulumPath.forEach(function(pos, posIndex) {
-        var newLetter = letters.charAt(this.letterIndex);//prende la lettera all'indice letterIndex
+        var newLetter = this.privateLetters.charAt(this.letterIndex);//prende la lettera all'indice letterIndex
 // tenere le tettere distanziate
   var nextPosIndex = this.pendulumPath.findIndex(function(nextPos, nextPosIndex) {
   if (nextPosIndex > posIndex) {
@@ -196,7 +197,7 @@ class Pendulum{
   } //fine classe Pendulum
 
 function mousePressed() {
-  newShape = new Shape(color(random(360), 80, 60)); //constructor function
+  newShape = new Shape(color(random(360), 80, 60), letters); //constructor function
   newShape.addPos(mouseX, mouseY); //posizione
 }
 
