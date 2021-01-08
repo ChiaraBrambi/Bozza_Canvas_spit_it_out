@@ -9,7 +9,7 @@ let speechRec = new p5.SpeechRec(lang, gotSpeech);
 let shapes = [];
 let newShape;
 
-let articolazioni = 4;
+let articolazioni = 1;
 let lineLength = 128; //lunghezza poi da inpostare in base a quanto è lunga la stringa della parola
 var resolution = 0.04; //risoluzone 0.04; / scrive da solo
 var gravity = 0.094;
@@ -38,8 +38,8 @@ function draw() {
   background(255);
   //per ogni elemento dell'array chiama le seguenti funzioni
   shapes.forEach(function(shape){
-    shape.draw();
-    shape.update();
+   shape.draw();
+   shape.update();
   }); //non sei obbligato a dare un nome ad una funzione
 
   if (newShape) { //se newShape == true viene attivato il comando
@@ -82,6 +82,7 @@ class Shape{
   this.privateLetters = string;
 }
 
+// serve per creare il percorso del mouse
   addPos(x,y){//Shape.prototype.addPos = function(x, y) { //per chiamare piu classi diverse
   //nomeClasse.protoype.nomeFunzione = function(){
   //codice da svolgere per ogni classe }
@@ -168,7 +169,7 @@ class Pendulum{
 }
 
   update(heading){
-    this.end.set(this.origin.x + this.size * sin(this.angle), this.origin.y + this.size * cos(this.angle));
+    this.end.set(this.origin.x + this.size * sin(this.angle), this.origin.y + this.size * cos(this.angle)); //qui imposta il punto finale
 
     this.angularAcceleration = (-this.gravity / this.size) * sin(this.angle + heading);
     this.angle += this.angularVelocity;
@@ -181,22 +182,17 @@ class Pendulum{
   };
 
 
-    getTrail(offset, end){  //dà il percorso di this
-      if (this.pendulumArm) {
-        if (end) {
-          end.add(this.end);
-        } else {
-          end = this.end.copy();
-        }
-        return this.pendulumArm.getTrail(offset, end);
-      } else {
-        return this.end.copy().add(end).add(offset);
-      }
+    getTrail(offset, end){  //dà il percorso della fine del braccio, credo
+        var nuo =  this.end.copy().add(end).add(offset);
+        console.log(nuo);
+        return nuo;
+
     };
 
   } //fine classe Pendulum
 
 function mousePressed() {
+
   newShape = new Shape(color(random(360), 80, 60), letters); //constructor function
   newShape.addPos(mouseX, mouseY); //posizione
 }
@@ -205,12 +201,3 @@ function mouseReleased() { //quando lascio il mouse
   shapes.push(newShape); //crea forma
   newShape = undefined;
 }
-
-  keyReleased = function() {
-  if (keyCode == DELETE || keyCode == BACKSPACE){ background(255);
-    }
-  }
-
-  function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-  }
